@@ -1,9 +1,11 @@
-export class User {
-  id: number;
-  name: string;
+import { Color } from "./Color";
 
-  constructor(id: number, name: string) {
-    this.id = id;
+export class User {
+  name: string;
+  personalColor: Color;
+
+  constructor(name: string, color?: string) {
     this.name = name;
+    this.personalColor = new Color(color ?? "gray");
   }
 }

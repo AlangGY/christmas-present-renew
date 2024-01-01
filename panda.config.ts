@@ -4,10 +4,19 @@ const globalStyles = defineGlobalStyles({
   "*": {
     boxSizing: "border-box",
   },
+  html: {
+    height: "100%",
+  },
   body: {
     margin: 0,
     padding: 0,
     fontFamily: "apple-system, sans-serif",
+    height: "100%",
+  },
+  h1: {
+    fontSize: "2rem",
+    fontWeight: "bold",
+    lineHeight: "1.2",
   },
   button: {
     cursor: "pointer",
