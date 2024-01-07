@@ -1,17 +1,35 @@
 import { User } from "@/modules/models/user";
 import supabaseClient from "../supabase/SupabaseClient";
 import { Present } from "@/modules/models/present";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import {
+  REALTIME_CHANNEL_STATES,
+  RealtimeChannel,
+} from "@supabase/supabase-js";
 
 export type PresenceState = {
-  user: User;
+  user?: User;
   present?: Present;
+  isReady?: boolean;
 };
 
 export class RoomFetcher {
   realtimeClient = supabaseClient;
   channel: RealtimeChannel | null = null;
   onSyncState?: (payload: PresenceState[]) => void;
+
+  localState: PresenceState | null = null;
+
+  private setLocalState(state: Partial<PresenceState>) {
+    this.localState = {
+      ...this.localState,
+      ...state,
+    };
+  }
+
+  private async syncPresenceState(state: PresenceState) {
+    if (!this.channel) return;
+    await this.channel.track(state);
+  }
 
   async joinRoom(roomId: string, user: User) {
     const channel = this.realtimeClient.channel(`room:${roomId}`, {
@@ -21,12 +39,14 @@ export class RoomFetcher {
         },
       },
     });
+    if (channel.state === REALTIME_CHANNEL_STATES.joined) return;
     this.channel = channel;
+    this.setLocalState({ user, isReady: false });
     channel.subscribe(async (status) => {
-      if (status !== "SUBSCRIBED") {
+      if (status !== "SUBSCRIBED" || !this.localState) {
         return null;
       }
-      const presenceTrackStatus = await channel.track({ user });
+      this.syncPresenceState(this.localState);
     });
 
     channel
@@ -35,20 +55,20 @@ export class RoomFetcher {
         this.onSyncState?.(newState[roomId]);
       })
       .on("presence", { event: "join" }, ({ key, newPresences }) => {})
-      .on("presence", { event: "leave" }, ({ key, leftPresences }) => {})
-      .subscribe();
+      .on("presence", { event: "leave" }, ({ key, leftPresences }) => {});
   }
 
-  async postPresent(user: User, present: Present) {
-    if (!this.channel) return;
-    const presenceTrackStatus = await this.channel.track({
-      user,
-      present,
-    });
-    console.log(presenceTrackStatus);
+  async postPresent(present: Present) {
+    if (!this.channel || !this.localState) return;
+    this.setLocalState({ present });
+    await this.channel.track(this.localState);
   }
 
-  onReceiveMessage(payload: any) {}
+  async updateReadyState(isReady: boolean) {
+    if (!this.channel || !this.localState) return;
+    this.setLocalState({ isReady });
+    await this.channel.track(this.localState);
+  }
 
   setOnSyncState(cb: (payload: any) => void) {
     this.onSyncState = cb;

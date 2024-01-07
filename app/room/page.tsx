@@ -10,7 +10,8 @@ import { PresentForm } from "@/modules/ui/PresentForm/PresentForm";
 import { UserAvatar } from "@/modules/ui/User/UserAvatar";
 import { UserAvatarList } from "@/modules/ui/User/UserAvatarList";
 import { css } from "@/styled-system/css";
-import { Box, Flex, Heading } from "@radix-ui/themes";
+import { flex } from "@/styled-system/patterns";
+import { Box, Button, Flex, Heading } from "@radix-ui/themes";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
@@ -32,8 +33,15 @@ export default function RoomPage() {
     [name, color]
   );
 
-  const { users, presents, postPresent } = useRoom({
-    user: me,
+  const {
+    myState,
+    users,
+    presents,
+    isAllUserHaveRegisteredPresent,
+    postPresent,
+    toggleReady,
+  } = useRoom({
+    myUser: me,
   });
 
   return (
@@ -59,11 +67,29 @@ export default function RoomPage() {
             );
           }}
         />
+        <form
+          className={flex({
+            justifyContent: "center",
+            marginTop: "2",
+          })}
+        >
+          <Button
+            type="button"
+            color={myState?.isReady ? "red" : "green"}
+            onClick={() => {
+              toggleReady();
+            }}
+          >
+            {myState?.isReady ? "준비 취소" : "준비 완료"}
+          </Button>
+        </form>
         <Flex justify="center" className={css({})}>
-          <ChristmasBoxListCarousel
-            presents={presents}
-            onClickPresent={() => {}}
-          />
+          {isAllUserHaveRegisteredPresent && (
+            <ChristmasBoxListCarousel
+              presents={presents}
+              onClickPresent={() => {}}
+            />
+          )}
         </Flex>
         <div
           className={css({
@@ -77,7 +103,11 @@ export default function RoomPage() {
             right={
               <UserAvatarList>
                 {users.map((user) => (
-                  <UserAvatar key={user.name} user={user} />
+                  <UserAvatar
+                    key={user.user.name}
+                    user={user.user}
+                    isReady={user.isReady}
+                  />
                 ))}
               </UserAvatarList>
             }
