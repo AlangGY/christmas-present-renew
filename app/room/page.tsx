@@ -4,6 +4,7 @@ import { useRoom } from "@/modules/feature/room/useRoom";
 import { Present } from "@/modules/models/present";
 import { User } from "@/modules/models/user";
 import { ChristmasBoxListCarousel } from "@/modules/ui/ChristmasBox/ChristmasBoxListCarousel";
+import { ContentLayout } from "@/modules/ui/ContentLayout/ContentLayout";
 import { FooterLayout } from "@/modules/ui/Footer/FooterLayout";
 import { HeaderLayout } from "@/modules/ui/Header/HeaderLayout";
 import { PresentForm } from "@/modules/ui/PresentForm/PresentForm";
@@ -46,15 +47,8 @@ export default function RoomPage() {
 
   return (
     <>
-      <Box
-        px="4"
-        height="100%"
-        style={{
-          backgroundColor: "var(--gray-a2)",
-          borderRadius: "var(--radius-3)",
-        }}
-      >
-        <HeaderLayout center={<Heading>크리스마스 선물 고르기</Heading>} />
+      <HeaderLayout center={<Heading>크리스마스 선물 고르기</Heading>} />
+      <ContentLayout>
         <PresentForm
           onSubmit={(form) => {
             postPresent(
@@ -83,7 +77,16 @@ export default function RoomPage() {
             {myState?.isReady ? "준비 취소" : "준비 완료"}
           </Button>
         </form>
-        <Flex justify="center" className={css({})}>
+        <Flex
+          justify="center"
+          className={css({
+            marginTop: "5px",
+            position: "absolute",
+            left: "0",
+            right: "0",
+            bottom: "8px",
+          })}
+        >
           {isAllUserHaveRegisteredPresent && (
             <ChristmasBoxListCarousel
               presents={presents}
@@ -91,29 +94,20 @@ export default function RoomPage() {
             />
           )}
         </Flex>
-        <div
-          className={css({
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-          })}
-        >
-          <FooterLayout
-            right={
-              <UserAvatarList>
-                {users.map((user) => (
-                  <UserAvatar
-                    key={user.user.name}
-                    user={user.user}
-                    isReady={user.isReady}
-                  />
-                ))}
-              </UserAvatarList>
-            }
-          />
-        </div>
-      </Box>
+      </ContentLayout>
+      <FooterLayout
+        right={
+          <UserAvatarList>
+            {users.map((user) => (
+              <UserAvatar
+                key={user.user.name}
+                user={user.user}
+                isReady={user.isReady}
+              />
+            ))}
+          </UserAvatarList>
+        }
+      />
     </>
   );
 }

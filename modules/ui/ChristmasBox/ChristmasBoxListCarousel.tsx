@@ -3,6 +3,7 @@ import { ChristmasBox } from "./ChristmasBox";
 import { css } from "@/styled-system/css";
 import { useLayoutEffect, useRef, useState } from "react";
 import { flex, hstack } from "@/styled-system/patterns";
+import { Button } from "@radix-ui/themes";
 
 interface Props {
   presents: Present[];
@@ -43,24 +44,29 @@ export function ChristmasBoxListCarousel({ presents, onClickPresent }: Props) {
       <div className={carouselStyle} ref={carouselRef}>
         <ul className={ulStyle} ref={ulRef}>
           {presents.map((present, index) => (
-            <li
-              key={present.id}
-              // style={{
-              //   display: index === currentIndex ? "block" : "none",
-              // }}
-            >
+            <li key={present.id}>
               <ChristmasBox label={(index + 1).toString()} />
             </li>
           ))}
         </ul>
       </div>
       <div className={buttonContainerStyle}>
-        <button>
+        <Button
+          size="4"
+          style={{
+            flexGrow: 1,
+          }}
+        >
           <span onClick={prev}>⬅</span>
-        </button>
-        <button>
+        </Button>
+        <Button
+          size="4"
+          style={{
+            flexGrow: 1,
+          }}
+        >
           <span onClick={next}>➡</span>
-        </button>
+        </Button>
       </div>
     </div>
   );
