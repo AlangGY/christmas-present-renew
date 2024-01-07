@@ -10,6 +10,7 @@ export type PresenceState = {
   user?: User;
   present?: Present;
   isReady?: boolean;
+  choice?: Present;
 };
 
 export class RoomFetcher {
@@ -61,6 +62,16 @@ export class RoomFetcher {
   async postPresent(present: Present) {
     if (!this.channel || !this.localState) return;
     this.setLocalState({ present });
+    await this.channel.track(this.localState);
+  }
+
+  async togglePresentChoice(present: Present) {
+    if (!this.channel || !this.localState) return;
+    if (this.localState.choice?.id === present.id) {
+      this.setLocalState({ choice: undefined });
+    } else {
+      this.setLocalState({ choice: present });
+    }
     await this.channel.track(this.localState);
   }
 

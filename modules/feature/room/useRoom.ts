@@ -37,6 +37,21 @@ export function useRoom({ myUser }: Props) {
     [roomState]
   );
 
+  const chosenPresents = useMemo(
+    () =>
+      roomState
+        .filter<{ choice: Present; user: User }>(
+          (state): state is { choice: Present; user: User } => {
+            return !!state.choice && !!state.user;
+          }
+        )
+        .map((state) => ({
+          present: state.choice,
+          chosenBy: state.user,
+        })),
+    [roomState]
+  );
+
   const isAllUserHaveRegisteredPresent = useMemo(
     () =>
       users.every(
@@ -47,8 +62,35 @@ export function useRoom({ myUser }: Props) {
     [users, presents]
   );
 
+  const isAllUserChosePresent = useMemo(
+    () =>
+      users.every(
+        (user) =>
+          chosenPresents.some(
+            (chosenPresent) =>
+              chosenPresent.chosenBy.name === user.user.name &&
+              chosenPresent.present
+          ) && user.isReady
+      ),
+    [users, chosenPresents]
+  );
+
   const postPresent = (present: Present) => {
     roomFetcher.postPresent(present);
+  };
+
+  const choosePresent = (present: Present) => {
+    if (
+      chosenPresents.some(
+        (chosenPresent) =>
+          chosenPresent.present?.id === present.id &&
+          chosenPresent.chosenBy.name !== myUser.name
+      )
+    ) {
+      alert("이미 선택된 선물입니다.");
+      return;
+    }
+    roomFetcher.togglePresentChoice(present);
   };
 
   const toggleReady = () => {
@@ -68,8 +110,11 @@ export function useRoom({ myUser }: Props) {
     myState,
     users,
     presents,
+    chosenPresents,
     isAllUserHaveRegisteredPresent,
+    isAllUserChosePresent,
     postPresent,
     toggleReady,
+    choosePresent,
   };
 }

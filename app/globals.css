@@ -7,3 +7,7 @@
     font-size: 16px;
   }
 }
+
+html .radix-themes {
+  --cursor-button: pointer;
+}

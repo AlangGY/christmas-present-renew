@@ -53,6 +53,11 @@ export default defineConfig({
           "0%": { transform: "rotate3d(0,0,0,0deg)" },
           "100%": { transform: "rotate3d(1,1,1,360deg)" },
         },
+        showFromBottom: {
+          "0%": { opacity: 0, transform: "translateY(100%)" },
+          "50%": { opacity: 0, transform: "translateY(50%)" },
+          "100%": { opacity: 1 },
+        },
       },
     },
   },

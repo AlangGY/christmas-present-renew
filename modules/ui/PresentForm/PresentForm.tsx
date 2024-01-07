@@ -1,14 +1,15 @@
-import { Button, TextField } from "@radix-ui/themes";
+import { Box, Button, Flex, TextArea, TextField } from "@radix-ui/themes";
 
 type FormPayload = {
   description: string;
 };
 
 interface Props {
+  isRegistered?: boolean;
   onSubmit?: (formPayload: FormPayload) => void;
 }
 
-export function PresentForm({ onSubmit }: Props) {
+export function PresentForm({ isRegistered = false, onSubmit }: Props) {
   return (
     <form
       onSubmit={(e) => {
@@ -22,16 +23,17 @@ export function PresentForm({ onSubmit }: Props) {
       }}
     >
       <label htmlFor="description">
-        한줄평
-        <TextField.Root size="3">
-          <TextField.Input
+        한줄평 등록하기
+        <Flex direction="column" gap="2">
+          <TextArea
             id="description"
+            size="3"
             placeholder="선물에 대한 한줄평을 작성해주세요!"
           />
-          <TextField.Slot>
-            <Button type="submit">등록</Button>
-          </TextField.Slot>
-        </TextField.Root>
+          <Button type="submit" color={isRegistered ? "gray" : "green"}>
+            {isRegistered ? "수정하기" : "등록하기"}
+          </Button>
+        </Flex>
       </label>
     </form>
   );
